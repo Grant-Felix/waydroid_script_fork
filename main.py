@@ -313,7 +313,7 @@ gapps: Install Open GApps (Android 11) or MindTheGapps (Android 13)
 microg: Add microG, Aurora Store and Aurora Droid to WayDriod
 libndk: Add libndk arm translation, better for AMD CPUs
 libhoudini: Add libhoudini arm translation, better for Intel CPUs
-magisk: Install Magisk Delta to WayDroid
+magisk: Install Kitsune Mask (Magisk Delta) v27.2-kitsune-4 to WayDroid
 mitm -c CA_CERT_FILE: Install root CA cert into system trust store
 smartdock: A desktop mode launcher for Android
 widevine: Add support for widevine DRM L3

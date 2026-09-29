@@ -2,13 +2,34 @@
 
 Script to add GApps and other stuff to Waydroid!
 
+> 本仓库是 [casualsnek/waydroid_script](https://github.com/casualsnek/waydroid_script) 的 **Fork**，改动集中在 Magisk / Kitsune Mask 的安装源与文档，详见下面「本 Fork 的改动」。
+
+## 本 Fork 的改动
+
+- **Magisk 安装源**：从已停更 / 已失效的 Magisk Delta 渠道换成 **Kitsune Mask（Magisk Delta 续作）`v27.2-kitsune-4`**
+  - 版本标识：`MAGISK_VER=v27.2-kitsune-4` / `MAGISK_VER_CODE=27002` —— 该谱系**最后一个真实版本号**，保留内置 Zygisk
+  - 资产：`Kitsune.Magisk.release.v27.2-kitsune-4.apk`（12,770,643 字节）
+  - sha256：`818cfa02783ddae573cc953450fbc39ec3e5164b66e517c657ba11cf90963a89`
+  - 下载源（本仓库自建 release，写在 `stuff/magisk.py` 的 `dl_link`）：
+    - 主：`https://github.com/Grant-Felix/KitsuneMagiskFork/releases/download/v27.2-kitsune-4/Kitsune.Magisk.release.v27.2-kitsune-4.apk`
+    - 镜像：`https://github.com/Grant-Felix/waydroid_script_fork/releases/download/magisk-v27.2-kitsune-4/Kitsune.Magisk.release.v27.2-kitsune-4.apk`
+- **为什么换**：原作者 HuskyDG 的仓库与账号已删除、官方更新服务器全部 404，脚本原先使用的 Delta 26.3（2024-01 构建）已无法升级。
+- **一键准备**：仓库自带 [`setup.sh`](setup.sh)，一条命令克隆 + 建 venv + 装依赖（见下）。
+
 # Installation/Usage
+
+## 一键准备（可选）
+
+```bash
+bash setup.sh                      # 克隆/更新 + venv + 依赖，然后打印后续命令
+bash setup.sh install magisk       # 准备完直接安装 Kitsune Mask v27.2-kitsune-4
+```
 
 ## Interactive terminal interface
 
 ```
-git clone https://github.com/casualsnek/waydroid_script
-cd waydroid_script
+git clone https://github.com/Grant-Felix/waydroid_script_fork
+cd waydroid_script_fork
 python3 -m venv venv
 venv/bin/pip install -r requirements.txt
 sudo venv/bin/python3 main.py
@@ -25,8 +46,8 @@ sudo venv/bin/python3 main.py
 ## Command Line
 
 ```bash
-git clone https://github.com/casualsnek/waydroid_script
-cd waydroid_script
+git clone https://github.com/Grant-Felix/waydroid_script_fork
+cd waydroid_script_fork
 python3 -m venv venv
 venv/bin/pip install -r requirements.txt
 # install something
@@ -77,9 +98,30 @@ Open terminal and switch to directory where "main.py" is located then run:
 
     sudo venv/bin/python3 main.py install magisk
 
+本 Fork 安装的是 **Kitsune Mask（Magisk Delta 续作）v27.2-kitsune-4**（`MAGISK_VER_CODE=27002`，内置 Zygisk），从本仓库自建 release 下载；版本、sha256 与两个下载地址见上文「本 Fork 的改动」。
+
 Magisk will be installed on next boot! 
 
 Zygisk and modules like LSPosed should work now.
+
+### 从旧版（Magisk Delta 26.3 / Kitsune 31.0-kitsune）切换过来
+
+新旧签名不同（旧版为 HuskyDG 签名，本版为 `TestKey-2024`），**必须先卸载旧管理器**，否则管理器无法覆盖安装：
+
+```bash
+sudo waydroid shell pm uninstall io.github.huskydg.magisk
+sudo venv/bin/python3 main.py uninstall magisk
+sudo venv/bin/python3 main.py install magisk
+```
+
+重启 Waydroid 后验证：
+
+```bash
+sudo waydroid shell magisk -v   # 期望 v27.2-kitsune-4
+sudo waydroid shell magisk -V   # 期望 27002
+```
+
+> 重装会清空 `/data/adb/magisk`（模块列表与授权记录会丢），升级前建议先备份 `/data/adb/modules`。
 
 If you want to update Magisk, Please use `Direct Install into system partition` or run this sript again.
 
@@ -198,7 +240,8 @@ Check [waydroid-magisk](https://github.com/nitanmarcel/waydroid-magisk)
 
 ## Credits
 - [WayDroid](https://github.com/waydroid/waydroid)
-- [Magisk Delta](https://huskydg.github.io/magisk-files/)
+- [Kitsune Mask（Magisk Delta 续作）· 本 Fork 所用 v27.2-kitsune-4 的上游](https://github.com/AndnixSH/KitsuneMagisk)
+- [本 Fork 自建的 Magisk release](https://github.com/Grant-Felix/KitsuneMagiskFork/releases/tag/v27.2-kitsune-4)
 - [microG Project](https://microg.org)
 - [Open GApps](https://opengapps.org)
 - [Smart Dock](https://github.com/axel358/smartdock)
