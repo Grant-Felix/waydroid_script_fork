@@ -38,16 +38,17 @@ for p in "$HOME/.local/share/waydroid/data/adb" /var/lib/waydroid/data/adb; do
 done
 
 sec "6. 设备内的管理器与 magisk 目录"
-sudo waydroid shell pm list packages 2>/dev/null | grep -iE 'huskydg|magisk|kitsune' || echo "   没有匹配的包（管理器未安装？）"
-sudo waydroid shell ls -la /system/etc/init/magisk 2>&1 | head -20
+sudo waydroid shell -- pm list packages 2>/dev/null | grep -iE 'huskydg|magisk|kitsune' || echo "   没有匹配的包（管理器未安装？）"
+sudo waydroid shell -- ls -la /system/etc/init/magisk 2>&1 | head -20
 
 sec "7. 设备内版本探测"
-sudo waydroid shell /system/etc/init/magisk/magisk64 -c 2>&1 | head -3
-sudo waydroid shell /data/adb/magisk/magisk64 -c 2>&1 | head -3
-sudo waydroid shell magisk -v 2>&1 | head -3
+sudo waydroid shell -- /system/etc/init/magisk/magisk64 -c 2>&1 | head -3
+sudo waydroid shell -- /data/adb/magisk/magisk64 -c 2>&1 | head -3
+sudo waydroid shell -- magisk -v 2>&1 | head -3
+sudo waydroid shell -- magisk -V 2>&1 | head -3
 
 sec "8. 相关日志（logcat / dmesg，尾部）"
-sudo waydroid shell logcat -d 2>/dev/null | grep -iE 'magisk|zygisk|selinux|init: ' | tail -60
+sudo waydroid shell -- logcat -d 2>/dev/null | grep -iE 'magisk|zygisk|selinux|init: ' | tail -60
 sudo waydroid shell dmesg 2>/dev/null | grep -iE 'magisk|init:' | tail -40
 
 sec "9. 安装日志（如已保存）"

@@ -133,11 +133,24 @@ sudo venv/bin/python3 main.py uninstall magisk
 sudo venv/bin/python3 main.py install magisk
 ```
 
-重启 Waydroid 后验证：
+Magisk 会在**下次启动 Waydroid 时**生效，所以先重启会话：
 
 ```bash
-sudo waydroid shell magisk -v   # 期望 v27.2-kitsune-4
-sudo waydroid shell magisk -V   # 期望 27002
+sudo waydroid session stop
+waydroid show-full-ui          # 重新启动（或 sudo systemctl restart waydroid-container）
+```
+
+重启后验证（注意：`waydroid shell` 后面的参数若带 `-` 必须用 `--` 隔开，否则会被 waydroid 自己的 argparse 吞掉）：
+
+```bash
+sudo waydroid shell -- magisk -v     # 期望 v27.2-kitsune-4
+sudo waydroid shell -- magisk -V     # 期望 27002
+
+# 或者直接进 Android shell 里执行，最稳妥
+sudo waydroid shell
+#   magisk -v
+#   magisk -V
+#   exit
 ```
 
 > 重装会清空 `/data/adb/magisk`（模块列表与授权记录会丢），升级前建议先备份 `/data/adb/modules`。
