@@ -10,7 +10,12 @@ from tools import container
 class Magisk(General):
     id = "magisk delta"
     partition = "system"
-    dl_link = "https://github.com/mistrmochov/magiskdeltaorig/raw/main/app-release.apk"
+    # Kitsune Mask (Magisk Delta) v27.2-kitsune-4 —— 该谱系最后一个真实版本号（MAGISK_VER_CODE=27002，保留内置 Zygisk）
+    # 资源：Kitsune.Magisk.release.v27.2-kitsune-4.apk (12,770,643 bytes)
+    # sha256: 818cfa02783ddae573cc953450fbc39ec3e5164b66e517c657ba11cf90963a89
+    # 旧下载源（Delta 26.3，2024-01 构建，已停更）：https://github.com/mistrmochov/magiskdeltaorig/raw/main/app-release.apk
+    dl_link = "https://github.com/Grant-Felix/KitsuneMagiskFork/releases/download/v27.2-kitsune-4/Kitsune.Magisk.release.v27.2-kitsune-4.apk"
+    # 镜像（备用）：https://github.com/Grant-Felix/waydroid_script_fork/releases/download/magisk-v27.2-kitsune-4/Kitsune.Magisk.release.v27.2-kitsune-4.apk
     dl_file_name = "magisk.apk"
     extract_to = "/tmp/magisk_unpack"
     magisk_dir = os.path.join(partition, "etc", "init", "magisk")
