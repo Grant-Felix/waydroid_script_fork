@@ -104,6 +104,25 @@ Magisk will be installed on next boot!
 
 Zygisk and modules like LSPosed should work now.
 
+### 网络受限 / 下载失败时（离线 / 镜像安装）
+
+GitHub release 资源在部分网络环境下会超时或被阻断，脚本支持两种绕过方式：
+
+```bash
+# 1) 离线：用任意方式拿到 APK 后指向本地文件（完全不联网）
+WAYDROID_MAGISK_APK=/path/to/Kitsune.Magisk.release.v27.2-kitsune-4.apk \
+  sudo -E venv/bin/python3 main.py install magisk
+
+# 2) 镜像：脚本先试内置地址，失败后再依次尝试这里给的地址
+WAYDROID_MAGISK_URLS="https://your-mirror/Kitsune.Magisk.release.v27.2-kitsune-4.apk,https://another/x.apk" \
+  sudo -E venv/bin/python3 main.py install magisk
+```
+
+- `sudo -E` 用于把环境变量传入脚本；也可写成 `sudo WAYDROID_MAGISK_APK=... venv/bin/python3 main.py install magisk`
+- 所有地址都失败时，脚本会列出尝试过的地址与最后一个错误（而不是静默失败）
+- 同一个 release 里还有**未混淆的 debug 包** `Kitsune.Magisk.debug.v27.2-kitsune-4.apk`（21,337,293 B，sha256 `f7e8c0235ddaaa2f4044ed6e9db03b300127a3414fb449a6ebf8f77ffb4d0896`），版本同样是 27002、同样带 Zygisk；若 release 包的管理器 App 有异常，可换成它
+- 排障脚本：[`diagnose_mask.sh`](diagnose_mask.sh)（`bash diagnose_mask.sh > /tmp/mask.log 2>&1`）
+
 ### 从旧版（Magisk Delta 26.3 / Kitsune 31.0-kitsune）切换过来
 
 新旧签名不同（旧版为 HuskyDG 签名，本版为 `TestKey-2024`），**必须先卸载旧管理器**，否则管理器无法覆盖安装：

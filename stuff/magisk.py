@@ -2,6 +2,7 @@ import gzip
 import os
 import shutil
 import re
+import zipfile
 from stuff.general import General
 from tools.helper import download_file, get_data_dir, host
 from tools.logger import Logger
@@ -59,10 +60,45 @@ on property:init.svc.zygote=stopped
     """
 
     def download(self):
+        # 离线 / 镜像支持（网络受限时很有用）：
+        #   WAYDROID_MAGISK_APK=/path/to/Kitsune.Magisk.release.v27.2-kitsune-4.apk
+        #       直接用本地 APK，完全不联网
+        #   WAYDROID_MAGISK_URLS="https://mirror1/x.apk,https://mirror2/x.apk"
+        #       在 dl_link 之后依次尝试的备用地址，全部失败才报错
+        local_apk = os.environ.get("WAYDROID_MAGISK_APK")
+        if local_apk:
+            if not os.path.isfile(local_apk):
+                raise FileNotFoundError("WAYDROID_MAGISK_APK 指向的文件不存在: {}".format(local_apk))
+            Logger.info("Using local Magisk APK: {} -> {}".format(local_apk, self.download_loc))
+            shutil.copyfile(local_apk, self.download_loc)
+            return
+
         if os.path.isfile(self.download_loc):
             os.remove(self.download_loc)
-        Logger.info("Downloading latest Magisk-Delta to {} now ...".format(self.download_loc))
-        download_file(self.dl_link, self.download_loc)
+
+        urls = [self.dl_link]
+        urls += [u.strip() for u in os.environ.get("WAYDROID_MAGISK_URLS", "").split(",") if u.strip()]
+
+        last_error = None
+        for url in urls:
+            try:
+                Logger.info("Downloading Magisk-Delta to {} now ...\n  from {}".format(self.download_loc, url))
+                download_file(url, self.download_loc)
+                # 简单校验：必须是带 AndroidManifest.xml 的完整 APK
+                with zipfile.ZipFile(self.download_loc) as z:
+                    if "AndroidManifest.xml" not in z.namelist():
+                        raise ValueError("下载内容不是有效的 APK")
+                return
+            except Exception as e:
+                last_error = e
+                Logger.warning("下载失败（{}）：{}".format(url, e))
+                if os.path.isfile(self.download_loc):
+                    os.remove(self.download_loc)
+
+        raise RuntimeError(
+            "所有下载地址都失败，最后一个错误：{}\n"
+            "可改用离线安装： WAYDROID_MAGISK_APK=/path/to/apk sudo -E venv/bin/python3 main.py install magisk\n"
+            "或指定镜像： WAYDROID_MAGISK_URLS=\"https://your-mirror/x.apk\" sudo -E venv/bin/python3 main.py install magisk".format(last_error))
 
     # require additional setup
     def setup(self):
