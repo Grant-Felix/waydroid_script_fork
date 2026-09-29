@@ -32,31 +32,35 @@ service bootanim /system/bin/bootanimation
     task_profiles MaxPerformance
     
 """
+    # MAGISKTMP 必须是 KitsuneMagisk 认的那两个路径之一（get_magisk_tmp() 只看
+    # /debug_ramdisk/.magisk 与 /sbin/.magisk），否则连接守护进程时会打印
+    # "Start daemon on magisk tmpfs" 并直接失败。原来用的 /dev/<random> 只对
+    # huskydg 的 Delta 26.3 有效，在 KitsuneMagisk 27.x 上守护进程起不来。
     bootanim_component = f"""
 on post-fs-data
     start logd
     exec u:r:su:s0 root root -- /system/etc/init/magisk/magiskpolicy --live --magisk
     exec u:r:magisk:s0 root root -- /system/etc/init/magisk/magiskpolicy --live --magisk
     exec u:r:update_engine:s0 root root -- /system/etc/init/magisk/magiskpolicy --live --magisk
-    mkdir /dev/magisk_iqeoVo2mDrO 700
-    exec u:r:su:s0 root root -- /system/etc/init/magisk/magisk64 --auto-selinux --setup-sbin /system/etc/init/magisk /dev/magisk_iqeoVo2mDrO
-    exec u:r:su:s0 root root -- /dev/magisk_iqeoVo2mDrO/magisk --auto-selinux --post-fs-data
+    mkdir /debug_ramdisk 755
+    exec u:r:su:s0 root root -- /system/etc/init/magisk/magisk64 --auto-selinux --setup-sbin /system/etc/init/magisk /debug_ramdisk
+    exec u:r:su:s0 root root -- /debug_ramdisk/magisk --auto-selinux --post-fs-data
 
 on nonencrypted
-    exec u:r:su:s0 root root -- /dev/magisk_iqeoVo2mDrO/magisk --auto-selinux --service
+    exec u:r:su:s0 root root -- /debug_ramdisk/magisk --auto-selinux --service
 
 on property:vold.decrypt=trigger_restart_framework
-    exec u:r:su:s0 root root -- /dev/magisk_iqeoVo2mDrO/magisk --auto-selinux --service
+    exec u:r:su:s0 root root -- /debug_ramdisk/magisk --auto-selinux --service
 
 on property:sys.boot_completed=1
     mkdir /data/adb/magisk 755
-    exec u:r:su:s0 root root -- /dev/magisk_iqeoVo2mDrO/magisk --auto-selinux --boot-complete
+    exec u:r:su:s0 root root -- /debug_ramdisk/magisk --auto-selinux --boot-complete
    
 on property:init.svc.zygote=restarting
-    exec u:r:su:s0 root root -- /dev/magisk_iqeoVo2mDrO/magisk --auto-selinux --zygote-restart
+    exec u:r:su:s0 root root -- /debug_ramdisk/magisk --auto-selinux --zygote-restart
    
 on property:init.svc.zygote=stopped
-    exec u:r:su:s0 root root -- /dev/magisk_iqeoVo2mDrO/magisk --auto-selinux --zygote-restart
+    exec u:r:su:s0 root root -- /debug_ramdisk/magisk --auto-selinux --zygote-restart
     """
 
     def download(self):

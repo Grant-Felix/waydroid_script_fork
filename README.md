@@ -100,6 +100,8 @@ Open terminal and switch to directory where "main.py" is located then run:
 
 本 Fork 安装的是 **Kitsune Mask（Magisk Delta 续作）v27.2-kitsune-4**（`MAGISK_VER_CODE=27002`，内置 Zygisk），从本仓库自建 release 下载；版本、sha256 与两个下载地址见上文「本 Fork 的改动」。
 
+> **Waydroid 兼容性（重要）**：init 钩子把 MAGISKTMP 放在 `/debug_ramdisk` —— KitsuneMagisk 27.x 的 `get_magisk_tmp()` 只认 `/debug_ramdisk/.magisk` 与 `/sbin/.magisk`，否则连接守护进程时会报 `Start daemon on magisk tmpfs` 并失败（旧版脚本用的 `/dev/<random>` 只对 huskydg 的 Delta 26.3 有效）。如果你以前装过旧钩子，**重新跑一次 `sudo venv/bin/python3 main.py install magisk` 再重启**即可换成新钩子。
+
 Magisk will be installed on next boot! 
 
 Zygisk and modules like LSPosed should work now.
